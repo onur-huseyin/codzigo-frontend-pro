@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import React from 'react'
 
 function PlantCardSkeleton() {
   return (
@@ -77,6 +78,7 @@ export function PlantList() {
   const [isAdding, setIsAdding] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
+  const [selectedLocation, setSelectedLocation] = useState('all')
   const [newPlant, setNewPlant] = useState({
     name: '',
     type: '',
@@ -92,25 +94,32 @@ export function PlantList() {
     queryFn: api.plants.getAll
   })
 
+  const locations = React.useMemo(() => {
+    if (!plants) return []
+    const uniqueLocations = new Set(plants.map(plant => plant.location))
+    return Array.from(uniqueLocations).filter(Boolean)
+  }, [plants])
+
   const filteredPlants = plants?.filter(plant => {
     const matchesSearch = plant.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesLocation = selectedLocation === 'all' || plant.location === selectedLocation
     
     switch (selectedFilter) {
       case 'low-water':
-        return matchesSearch && plant.weeklyWaterNeed < 2
+        return matchesSearch && matchesLocation && plant.weeklyWaterNeed < 2
       case 'medium-water':
-        return matchesSearch && plant.weeklyWaterNeed >= 2 && plant.weeklyWaterNeed < 4
+        return matchesSearch && matchesLocation && plant.weeklyWaterNeed >= 2 && plant.weeklyWaterNeed < 4
       case 'high-water':
-        return matchesSearch && plant.weeklyWaterNeed >= 4
+        return matchesSearch && matchesLocation && plant.weeklyWaterNeed >= 4
       case 'low-humidity':
-        return matchesSearch && plant.expectedHumidity < 50
+        return matchesSearch && matchesLocation && plant.expectedHumidity < 50
       case 'medium-humidity':
-        return matchesSearch && plant.expectedHumidity >= 50 && plant.expectedHumidity < 70
+        return matchesSearch && matchesLocation && plant.expectedHumidity >= 50 && plant.expectedHumidity < 70
       case 'high-humidity':
-        return matchesSearch && plant.expectedHumidity >= 70
+        return matchesSearch && matchesLocation && plant.expectedHumidity >= 70
       case 'all':
       default:
-        return matchesSearch
+        return matchesSearch && matchesLocation
     }
   }) || []
 
@@ -169,6 +178,19 @@ export function PlantList() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Bölge seçin" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Bölgeler</SelectItem>
+              {locations.map((location) => (
+                <SelectItem key={location} value={location}>
+                  {location}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={selectedFilter} onValueChange={setSelectedFilter}>
             <SelectTrigger className="w-[240px]">
               <SelectValue placeholder="Filtrele" />
