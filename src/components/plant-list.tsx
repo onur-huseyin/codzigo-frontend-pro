@@ -170,7 +170,7 @@ export function PlantList() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="flex-1">
             <Input
               placeholder="Bitki adına göre ara..."
@@ -179,7 +179,7 @@ export function PlantList() {
             />
           </div>
           <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-full sm:w-[200px]">
               <SelectValue placeholder="Bölge seçin" />
             </SelectTrigger>
             <SelectContent>
@@ -192,7 +192,7 @@ export function PlantList() {
             </SelectContent>
           </Select>
           <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-            <SelectTrigger className="w-[240px]">
+            <SelectTrigger className="w-full sm:w-[240px]">
               <SelectValue placeholder="Filtrele" />
             </SelectTrigger>
             <SelectContent>
